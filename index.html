@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Participation Activités</title>
+  <style>
+  body {
+    background-color: #162b3d;
+    color: #fff;
+    font-family: Arial, sans-serif;
+  }
+
+  h1 {
+    text-align: center;
+  }
+
+  .container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  .name {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .name span {
+    margin-right: 10px;
+  }
+
+  .button {
+    margin-left: 10px;
+  }
+</style>
+  <script>
+    function ajouterPoint(element) {
+      var pointSpan = element.parentNode.querySelector('.points');
+      var currentPoints = parseInt(pointSpan.innerHTML);
+      pointSpan.innerHTML = currentPoints + 1;
+    }
+    
+    function supprimerNom(element) {
+      var nameDiv = element.parentNode;
+      nameDiv.parentNode.removeChild(nameDiv);
+    }
+    
+    function reinitialiserPoints() {
+      var pointsSpans = document.getElementsByClassName("points");
+      for (var i = 0; i < pointsSpans.length; i++) {
+        pointsSpans[i].innerHTML = "0";
+      }
+    }
+    
+    function sauvegarderDonnees() {
+      var namesList = document.getElementById("namesList");
+      var names = [];
+      
+      // Parcourir tous les noms et les sauvegarder dans un tableau
+      for (var i = 0; i < namesList.children.length; i++) {
+        var nameDiv = namesList.children[i];
+        var nameSpan = nameDiv.querySelector('.name');
+        var pointSpan = nameDiv.querySelector('.points');
+        
+        var name = nameSpan.innerHTML;
+        var points = pointSpan.innerHTML;
+        
+        names.push({
+          name: name,
+          points: points
+        });
+      }
+      
+      // Convertir le tableau en une chaîne JSON
+      var data = JSON.stringify(names);
+      
+      // Enregistrer les données dans le localStorage
+      localStorage.setItem('namesData', data);
+    }
+    
+    function chargerDonnees() {
+      var data = localStorage.getItem('namesData');
+      
+      if (data) {
+        // Convertir la chaîne JSON en tableau
+        var names = JSON.parse(data);
+        
+        var namesList = document.getElementById("namesList");
+        namesList.innerHTML = "";
+        
+        // Parcourir le tableau de noms et créer les éléments correspondants
+        for (var i = 0; i < names.length; i++) {
+          var name = names[i].name;
+          var points = names[i].points;
+          
+          var nameDiv = document.createElement("div");
+          nameDiv.classList.add("name");
+          
+          var nameSpan = document.createElement("span");
+          nameSpan.innerHTML = name;
+          nameDiv.appendChild(nameSpan);
+          
+          var spaceSpan = document.createElement("span");
+          spaceSpan.innerHTML = "&nbsp;";
+          nameDiv.appendChild(spaceSpan);
+          
+          var pointSpan = document.createElement("span");
+          pointSpan.classList.add("points");
+          pointSpan.innerHTML = points;
+          nameDiv.appendChild(pointSpan);
+          
+          var buttonAjouter = document.createElement("button");
+          buttonAjouter.classList.add("button");
+          buttonAjouter.innerHTML = "Ajouter un point";
+          buttonAjouter.onclick = function() {
+            ajouterPoint(this);
+          };
+          nameDiv.appendChild(buttonAjouter);
+          
+          var buttonSupprimer = document.createElement("button");
+          buttonSupprimer.classList.add("button");
+          buttonSupprimer.innerHTML = "Supprimer";
+          buttonSupprimer.onclick = function() {
+            supprimerNom(this);
+          };
+          nameDiv.appendChild(buttonSupprimer);
+          
+          namesList.appendChild(nameDiv);
+        }
+      }
+    }
+    
+    function sauvegarderFichier() {
+      var namesList = document.getElementById("namesList");
+      var content = "";
+      
+      for (var i = 0; i < namesList.children.length; i++) {
+        var nameDiv = namesList.children[i];
+        var nameSpan = nameDiv.querySelector('.name');
+        var pointSpan = nameDiv.querySelector('.points');
+        
+        var name = nameSpan.innerHTML;
+        var points = pointSpan.innerHTML;
+        
+        content += name + "," + points + "\n";
+      }
+      
+      var link = document.createElement('a');
+      link.href = 'data:text/plain;charset=utf-8,' + encodeURIComponent(content);
+      link.download = 'sauvegarde.csv';
+      link.click();
+    }
+    
+    window.addEventListener('load', chargerDonnees);
+  </script>
+</head>
+<body>
+  <h1>Participation Activités</h1>
+  
+  <div>
+    <input type="text" id="nameInput" placeholder="Entrez un nom">
+    <button onclick="ajouterNom()">Ajouter un nom</button>
+  </div>
+  
+  <div id="namesList">
+    <!-- Noms ajoutés dynamiquement seront affichés ici -->
+  </div>
+  
+  <button onclick="reinitialiserPoints()">Réinitialiser les points</button>
+  <button onclick="sauvegarderFichier()">Sauvegarder</button>
+  
+  <script>
+    var namesList = document.getElementById("namesList");
+    var nameInput = document.getElementById("nameInput");
+    
+    function ajouterNom() {
+      var nom = nameInput.value.trim();
+      if (nom !== "") {
+        var nameDiv = document.createElement("div");
+        nameDiv.classList.add("name");
+        
+        var nameSpan = document.createElement("span");
+        nameSpan.innerHTML = nom;
+        nameDiv.appendChild(nameSpan);
+        
+        var spaceSpan = document.createElement("span");
+        spaceSpan.innerHTML = "&nbsp;";
+        nameDiv.appendChild(spaceSpan);
+        
+        var pointSpan = document.createElement("span");
+        pointSpan.classList.add("points");
+        pointSpan.innerHTML = "0";
+        nameDiv.appendChild(pointSpan);
+        
+        var buttonAjouter = document.createElement("button");
+        buttonAjouter.classList.add("button");
+        buttonAjouter.innerHTML = "Ajouter un point";
+        buttonAjouter.onclick = function() {
+          ajouterPoint(this);
+        };
+        nameDiv.appendChild(buttonAjouter);
+        
+        var buttonSupprimer = document.createElement("button");
+        buttonSupprimer.classList.add("button");
+        buttonSupprimer.innerHTML = "Supprimer";
+        buttonSupprimer.onclick = function() {
+          supprimerNom(this);
+        };
+        nameDiv.appendChild(buttonSupprimer);
+        
+        namesList.appendChild(nameDiv);
+        
+        nameInput.value = "";
+        
+        // Enregistrer les données dans le localStorage
+        sauvegarderDonnees();
+      }
+    }
+    
+    nameInput.addEventListener("keydown", function(event) {
+      if (event.key === "Enter") {
+        ajouterNom();
+      }
+    });
+  </script>
+</body>
+</html>
